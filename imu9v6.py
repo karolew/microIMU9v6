@@ -1,7 +1,8 @@
-from machine import I2C, Pin
-import time
-import math
 import json
+import math
+import time
+
+from machine import I2C, Pin
 
 
 class MinIMU9v6:

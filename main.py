@@ -1,5 +1,6 @@
-from machine import I2C, Pin
 import time
+
+from machine import I2C, Pin
 
 from imu9v6 import MinIMU9v6
 
@@ -30,8 +31,6 @@ def main():
             heading = sensor.get_tilt_compensated_heading()
 
             if heading is not None:
-                #direction = sensor.get_cardinal_direction(heading)
-                #print(f"Heading: {heading:6.2f}° ({direction:2s})  ", end="\r")
                 print(f"Heading: {heading:6.2f}°\t", end="\r")
                 fail_count = 0
             else:
