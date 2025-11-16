@@ -21,14 +21,15 @@ class Button:
             if pin.value() == 0 if self.pin_mode == Pin.PULL_UP else 1:
                 self.callback()
 
-calibration = False
+compas_calibration = False
 
 def handle_interrupt_for_compass_calibration() -> None:
-    global calibration
-    calibration = True
+    global compas_calibration
+    compas_calibration = True
     print("Calibration...    \r")
 
-compass_calibration_button = Button(19, handle_interrupt_for_compass_calibration)
+compass_calibration_button = Button(23, handle_interrupt_for_compass_calibration)
+compass_calibration_led_status = Pin(15, Pin.OUT)
 
 def main():
     # Initialize I2C (adjust pins if needed)
@@ -53,7 +54,9 @@ def main():
         fail_count = 0
 
         while True:
+            # ----------------------------------------------------------
             # Handle heading.
+            # ----------------------------------------------------------
             heading = sensor.get_tilt_compensated_heading()
 
             if heading is not None:
@@ -64,11 +67,15 @@ def main():
                 if fail_count > 10:
                     print("No magnetometer data - check sensor!      ", end="\r")
 
-            # Handle calibration
-            global calibration
-            if calibration:
-                sensor.calibrate_magnetometer(5)
-                calibration = False
+            # ----------------------------------------------------------
+            # Handle calibration.
+            # ----------------------------------------------------------
+            global compas_calibration
+            if compas_calibration:
+                compass_calibration_led_status.value(1)
+                sensor.calibrate_magnetometer(5)        # For demo purpose reduced to 5 second.
+                compass_calibration_led_status.value(0)
+                compas_calibration = False
 
             time.sleep_ms(50)
 
