@@ -9,10 +9,11 @@ class MinIMU9v6:
 
     CALIBRATION_FILE = "calibration.json"
 
-    def __init__(self, i2c, lsm_addr=0x6B, lis_addr=0x1E, calibrate: bool = False) -> None:
+    def __init__(self, i2c, lsm_addr=0x6B, lis_addr=0x1E, declination: float = 6.0, calibrate: bool = False) -> None:
         self.i2c = i2c
         self.lsm_addr = lsm_addr        # LSM6DSO (gyro/accel)
         self.lis_addr = lis_addr        # LIS3MDL (magnetometer)
+        self.declination = declination  # Magnetic declination in degrees
         self.calibrate = calibrate      # Calibrate before use.
 
         # Calibration offsets.
@@ -269,6 +270,9 @@ class MinIMU9v6:
         # Calculate heading.
         heading = math.atan2(mag_y, mag_x)
         heading = math.degrees(heading)
+
+        # Apply declination correction.
+        heading += self.declination
 
         # Normalize to 0-360 and return.
         return heading + 360 if heading < 0 else heading
